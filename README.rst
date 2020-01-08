@@ -9,10 +9,10 @@ visaplan.kitchen
 ================
 
 This package tackles "soup", i.e. trees which are created by the well-known
-beautifulsoup4 package from parsed HTML or XML sources.
-It might be possible to accomplish the same by using lxml directly,
+beautifulsoup4_ package from parsed HTML or XML sources.
+It might be possible to accomplish the same by using lxml_ directly,
 but it might have been more difficult, and thus it is left to another
-product.
+package.
 
 Features
 --------
@@ -32,6 +32,15 @@ Features
     new_id = id_factory(...)
     id = new_id(prefix)
 
+
+Tests remark
+------------
+
+The modules are documented and tested by doctests.
+However, they currently don't fully work because of import problems;
+see the `issue tracker`_.
+
+Help is appreciated.
 
 Examples
 --------
@@ -84,5 +93,7 @@ License
 The project is licensed under the GPLv2.
 
 .. _`issue tracker`: https://github.com/visaplan/kitchen/issues
+.. _`beautifulsoup4`: https://pypi.org/project/beautifulsoup4
+.. _`lxml`: https://pypi.org/project/lxml
 
 .. vim: tw=79 cc=+1 sw=4 sts=4 si et
