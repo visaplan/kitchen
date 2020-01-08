@@ -1,0 +1,8 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+    <!-- [ Modules of this Product ... [ -->
+    <include package=".forks" />
+    <include package=".ids" />
+    <include package=".spoons" />
+    <!-- ] ... Modules of this Product ] -->
+</configure>
