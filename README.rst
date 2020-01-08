@@ -1,3 +1,5 @@
+.. image:: https://travis-ci.org/visaplan/kitchen.svg?branch=master
+       :target: https://travis-ci.org/visaplan/kitchen
 .. This README is meant for consumption by humans and pypi. Pypi can render rst files so please do not use Sphinx features.
    If you want to learn more about writing documentation, please check out: http://docs.plone.org/about/documentation_styleguide.html
    This text does not appear on pypi or github. It is a comment.
@@ -65,8 +67,8 @@ and then running ``bin/buildout``
 Contribute
 ----------
 
-- Issue Tracker: https://github.com/visaplan/visaplan.kitchen/issues
-- Source Code: https://github.com/visaplan/visaplan.kitchen
+- Issue Tracker: https://github.com/visaplan/kitchen/issues
+- Source Code: https://github.com/visaplan/kitchen
 
 
 Support
@@ -81,6 +83,6 @@ License
 
 The project is licensed under the GPLv2.
 
-.. _`issue tracker`: https://github.com/visaplan/visaplan.kitchen/issues
+.. _`issue tracker`: https://github.com/visaplan/kitchen/issues
 
 .. vim: tw=79 cc=+1 sw=4 sts=4 si et
