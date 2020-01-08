@@ -1,2 +1,4 @@
 setuptools
 nose2
+beautifulsoup4
+visaplan.tools
