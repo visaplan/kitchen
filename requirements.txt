@@ -1,4 +1,3 @@
 setuptools
-nose
 beautifulsoup4
 visaplan.tools
