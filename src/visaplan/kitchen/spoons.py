@@ -2,6 +2,10 @@
 """\
 spoons: Werkzeuge für BeautifulSoup
 """
+from __future__ import print_function
+from __future__ import absolute_import
+from six.moves import map
+from six.moves import range
 
 __author__ = "Tobias Herp <tobias.herp@visaplan.com>"
 VERSION = (0,
@@ -83,10 +87,10 @@ __all__ = ('make_tag',
            )
 
 # Standardmodule:
-from string import letters, digits, whitespace
+from string import ascii_letters, digits, whitespace
 from collections import defaultdict
 import re
-from urlparse import urlsplit, urlunsplit, parse_qs
+from six.moves.urllib.parse import urlsplit, urlunsplit, parse_qs
 
 # Installierte Module:
 from bs4 import Tag, NavigableString, BeautifulSoup
@@ -459,9 +463,9 @@ def top_elements(txt, parser=None):
     try:
         soup = BeautifulSoup(txt, parser)
     except Exception as e:
-        print '!!! %s: %s' % (e.__class__.__name__, e)
-        print txt
-        print txt()
+        print('!!! %s: %s' % (e.__class__.__name__, e))
+        print(txt)
+        print(txt())
         raise
     single, tmp = extract_content(soup)
     if single:
@@ -621,7 +625,7 @@ def make_uid_generator(themap=DEFAULT_TAGS_AND_ATTRIBUTES):
     >>> list(f(txt2))
     [u'918f7934473e42f4a20f195f92115615']
     """
-    element_names = themap.keys()
+    element_names = list(themap.keys())
     get_tag_info = make_taginfo_extractor(themap=themap)
 
     def generate_uids(text=None, soup=None):
@@ -693,7 +697,7 @@ class MisplacedCharacterError(SelectorParsingError):
         self._dic = dict(locals())
 
 
-NAMECHARS = frozenset(letters + digits + '_-')
+NAMECHARS = frozenset(ascii_letters + digits + '_-')
 def parse_selector(spec):
     """
     Analysiere den übergebenen (atomaren) CSS-Selektor.
@@ -1611,11 +1615,11 @@ def change_text(elem, txt, force=False):
         elif force:
             elem.string = txt
         else:
-            print 'ELEMENT %s NOT CHANGED' % elem
+            print('ELEMENT %s NOT CHANGED' % elem)
     except AttributeError as e:
         from pprint import pprint
-        print '#'*79
-        print 'change_text:'
+        print('#'*79)
+        print('change_text:')
         pprint(sorted(locals().items())+ [
                ('type:', type(elem)),
                ('.string:', elem.string),
@@ -1623,9 +1627,9 @@ def change_text(elem, txt, force=False):
                ('.next_sibling:', elem.next_sibling),
                ('.parent:', elem.parent),
                ])
-        print 'Exception %s:' % e.__class__
-        print e
-        print '#'*79
+        print('Exception %s:' % e.__class__)
+        print(e)
+        print('#'*79)
         raise
 
 
@@ -1858,7 +1862,7 @@ def contents_stripped2(elem):
                 continue
             leaders_left = False
         """
-        # print 'Das Ende naht!', (next, child, prev, leaders_left)
+        # print('Das Ende naht!', (next, child, prev, leaders_left))
         if next is None and _strip_trailing_whitespace(child):
             continue
         """
@@ -2536,7 +2540,7 @@ def strip_empty_successor(elem):
     """
     changed = False
     sibs = list(elem.next_siblings)[:2]
-    # print elem, [sib.string for sib in sibs]
+    # print(elem, [sib.string for sib in sibs])
     first = True  # mutmaßlich obsolet
     dellist = []
     for sib in sibs:

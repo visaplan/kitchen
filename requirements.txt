@@ -1,3 +1,4 @@
 setuptools
+six
 beautifulsoup4
 visaplan.tools==1.2.6

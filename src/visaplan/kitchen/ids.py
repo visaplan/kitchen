@@ -3,6 +3,9 @@
 ids.py: Generierung von IDs
 """
 
+from __future__ import absolute_import
+import six
+from six.moves import map
 __author__ = "Tobias Herp <tobias.herp@visaplan.com>"
 VERSION = (0,
            1,  # Abgespeckte Kopie von Products.unitracc.tools.misc
@@ -49,7 +52,7 @@ def id_factory(existing=None, mask='%(prefix)s-%(idx)d'):
                     continue
             else:
                 none_allowed = True
-            if not isinstance(val, basestring):
+            if not isinstance(val, six.string_types):
                 raise ValueError('String expected; got %(val)r'
                                  % locals())
         # Präferenz angegeben?

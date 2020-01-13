@@ -7,6 +7,9 @@ Für Doctests muß BeautifulSoup importiert werden:
 
 >>> from bs4 import BeautifulSoup
 """
+from __future__ import print_function
+from __future__ import absolute_import
+from six.moves import map
 
 __all__ = ('extract_linktext',
            'inject_number',

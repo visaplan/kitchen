@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*- vim: et ts=8 sw=4 sts=4 si tw=79 cc=+1
 """Installer for the visaplan.kitchen package."""
 
+from __future__ import absolute_import
 from setuptools import find_packages
 from setuptools import setup
 from os.path import isfile
@@ -142,6 +143,7 @@ setup_kwargs = dict(
         "Framework :: Plone :: 4.3",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
         "Intended Audience :: Developers",
         "Natural Language :: German",
         "Operating System :: OS Independent",
@@ -161,6 +163,7 @@ setup_kwargs = dict(
     zip_safe=False,
     install_requires=[
         'setuptools',
+        'six',
         # -*- Extra requirements: -*-
         'beautifulsoup4',
         'visaplan.tools',
