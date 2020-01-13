@@ -2,6 +2,8 @@ language: python
 
 python:
 - "2.7"
+- "3.6"
+- "3.7"
 
 before_install:
 # (currently uses pip v19.3.1 instead of v19.0.3; still supports Python 2.7)
