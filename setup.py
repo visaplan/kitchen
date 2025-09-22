@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*- vim: et ts=8 sw=4 sts=4 si tw=79 cc=+1
 """Installer for the visaplan.kitchen package."""
+# Python compatibility:
+from __future__ import absolute_import, print_function
 
-from __future__ import absolute_import
-from setuptools import find_packages
-from setuptools import setup
+# Setup tools:
+from setuptools import find_packages, setup
+
+# Standard library:
 from os.path import isfile
+from sys import version_info, argv
 
 package_name = 'visaplan.kitchen'
 
@@ -24,7 +28,7 @@ def valid_suffix(suffix):
     suffix = suffix.strip()
     if not suffix:
         return suffix
-    allowed = set('.dev0123456789')
+    allowed = set('edv.0123456789rcpost')
     disallowed = set(suffix).difference(allowed)
     if disallowed:
         disallowed = ''.join(sorted(disallowed))
@@ -33,7 +37,7 @@ def valid_suffix(suffix):
                          % locals())
     chunks = suffix.split('.')
     chunk = chunks.pop(0)
-    if chunk:
+    if chunk and not chunk.startswith('rc') and not chunk.startswith('post'):
         raise ValueError('Version suffix must start with "."'
                          ' (%(suffix)r)'
                          % locals())
@@ -55,6 +59,7 @@ def valid_suffix(suffix):
         if char not in '0123456789':
             raise ValueError('Chunk %(chunk)r of version suffix %(suffix)r'
                              ' doesn\'t end with a digit'
+                             ' (normalization would append a "0")'
                              % locals())
     return suffix  # ... valid_suffix
     # ... get the version ...
@@ -63,10 +68,11 @@ VERSION = read_version('VERSION',
                        'VERSION_SUFFIX')
 # -------------------------------------------- ] ... get the version ]
 
+
 # ------------------------------------------- [ for setup_kwargs ... [
 long_description = '\n\n'.join([
     open('README.rst').read(),
-    open('CONTRIBUTORS.rst').read(),
+    open('TODO.rst').read(),
     open('CHANGES.rst').read(),
 ])
 
@@ -111,10 +117,17 @@ def github_urls(package, **kwargs):
         package = '.'.join(pkg_list)
     else:
         pick_user = pop('pick_user', 'user' not in kwargs)
+        given_user = pop('user', None)
         if pick_user:
             user = pkg_list[0]
-            if 'user' in kwargs:
-                assert pop('user') == user
+            if given_user is not None and given_user != user:
+                raise ValueError('given user %(given_user)r mismatches '
+                                 'user picked from package %(user)r!'
+                                 % locals())
+        elif given_user is not None:
+            user = given_user
+        else:
+            raise ValueError('no user given nor picked!')
     if pop('travis', False):  # reqires github to be trueish
         res.update({  # CHECKME: is there a de-facto standard key for this?
             'Tests': 'https://travis-ci.org/%(user)s/%(package)s' % locals()
@@ -130,6 +143,23 @@ project_urls = github_urls(package_name,
                            pop_user=1)  # or pick_user=1, or github=0
 # ------------------------------------------- ] ... for setup_kwargs ]
 
+def at_most_installing(args):
+    """
+    No non-installing command here
+
+    We don't recommend to combine installing and non-installing commands;
+    however, if the setup is called with some installing command *only*,
+    we can be more picky about what to accept.
+    """
+    if not args:
+        return True
+    for a in args:
+        if a.startswith('-'):
+            continue
+        if a not in ('install', 'develop'):
+            return False
+    return True
+
 setup_kwargs = dict(
     name=package_name,
     version=VERSION,
@@ -139,8 +169,6 @@ setup_kwargs = dict(
     # Get more from https://pypi.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         "Environment :: Web Environment",
-        "Framework :: Plone",
-        "Framework :: Plone :: 4.3",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
@@ -148,6 +176,7 @@ setup_kwargs = dict(
         "Natural Language :: German",
         "Operating System :: OS Independent",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+        "Topic :: Text Processing :: Markup :: HTML",
     ],
     # keywords='Python Plone',
     author='Tobias Herp',
@@ -165,8 +194,11 @@ setup_kwargs = dict(
         'setuptools',
         'six',
         # -*- Extra requirements: -*-
-        'beautifulsoup4',
-        'visaplan.tools',
+        'beautifulsoup4 >=4.3.2; python_version >="3"',  # KGS of Plone 4.3.3
+        # the last bs4 version known to support Python 2.7 is 4.9.3:
+        'beautifulsoup4 >=4.3.2, <4.10; python_version <"3"',
+        'lxml >=3.7.0',  # 2.1: parser argument; 3.7.0: collect_ids
+        'visaplan.tools >=1.3.7',  # .words.head(..., return_tuple)
     ],
     extras_require={
         'test': [
@@ -177,9 +209,10 @@ setup_kwargs = dict(
             'plone.app.robotframework[debug]',
         ],
     },
-    entry_points="""
-    [z3c.autoinclude.plugin]
-    target = plone
-    """,
 )
+if 0:
+    from pprint import pprint
+    del setup_kwargs['long_description']
+    pprint(setup_kwargs)
+    raise SystemExit(1)
 setup(**setup_kwargs)

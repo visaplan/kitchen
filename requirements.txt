@@ -1,4 +1,6 @@
 setuptools
 six
 beautifulsoup4
-visaplan.tools==1.2.6
+lxml
+../visaplan.tools
+# visaplan.tools >=1.4.0.dev3

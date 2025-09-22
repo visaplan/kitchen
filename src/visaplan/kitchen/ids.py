@@ -3,19 +3,20 @@
 ids.py: Generierung von IDs
 """
 
+# Python compatibility:
 from __future__ import absolute_import
-import six
+
+from six import string_types as six_string_types
 from six.moves import map
+
+# Standard library:
+from collections import defaultdict
+
 __author__ = "Tobias Herp <tobias.herp@visaplan.com>"
 VERSION = (0,
            1,  # Abgespeckte Kopie von Products.unitracc.tools.misc
            )
 __version__ = '.'.join(map(str, VERSION))
-
-
-# Standardmodule
-from collections import defaultdict
-
 
 __all__ = [
            # ---------------- [ aus Products.unitracc.tools.misc ... [
@@ -52,7 +53,7 @@ def id_factory(existing=None, mask='%(prefix)s-%(idx)d'):
                     continue
             else:
                 none_allowed = True
-            if not isinstance(val, six.string_types):
+            if not isinstance(val, six_string_types):
                 raise ValueError('String expected; got %(val)r'
                                  % locals())
         # Präferenz angegeben?
@@ -114,5 +115,6 @@ def sibling_id(elem, well_prefix, sink_prefix, make_id):
 
 
 if __name__ == '__main__':
+    # Standard library:
     import doctest
     doctest.testmod()

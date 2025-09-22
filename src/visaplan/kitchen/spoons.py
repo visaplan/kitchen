@@ -1,106 +1,127 @@
 # -*- coding: utf-8 -*- äöü vim: ts=8 sts=4 sw=4 si et tw=79
 """\
 spoons: Werkzeuge für BeautifulSoup
+
+blame markers:
+- swap_classes procedure
+  (Python 2 compatible)
 """
-from __future__ import print_function
-from __future__ import absolute_import
-from six.moves import map
-from six.moves import range
+# Python compatibility:
+from __future__ import absolute_import, print_function
+
+from six.moves import map, range
 
 __author__ = "Tobias Herp <tobias.herp@visaplan.com>"
 VERSION = (0,
            5,  # split_paragraphs (und benötigte Helferlein)
-           4,  # make_taginfo_extractor --> get_tag_info
+           5,  # stripped_soup bugfix
            )
 __version__ = '.'.join(map(str, VERSION))
-__all__ = ('make_tag',
-           'make_script',
-           'extract_content',  # siehe auch --> body_content und parsed_text
-           'top_elements',     # gibt eine Liste zurück
-           'get_single_element',
-           'insertAdjacentElement',
-           'INSERT_POSITIONS',
-           'parse_selector',
-           'make_levelfunc',
-           'make_find_expression',
-           # arbeiten mit Klassen;
-           # nur-lesende Filterfunktionen:
-           'has_class',
-           'has_all_classes',
-           'has_any_class',
-           'make_classes_generator',  # (kein Filter, sondern Generator-Factory)
-           'is_empty',
-           'is_whitespace',
-           'is_meat',
-           # sonstige Filterfunktionen:
-           'has_empty_line',
-           'is_block_element',
-           'is_block_with_p',
-           'is_hyperlink',
-           # Navigation:
-           'interesting_successor',
-           # Bearbeitungsfunktionen:
-           'classes_of',
-           'append_class',
-           'add_class',
-           'remove_class',
-           'remove_classes',
-           'check_class',
-           'change_text',
-           'extract_attributes',
-           # HTML-Bereinigung:
-           'split_paragraphs',
-           'strip_linebreaks',
-           'fence_texts',
-           'strip_empty_successor',
-           # ... Eigenarten der Parser einebnen:
-           'parsed_text',
-           'stripped_soup',
-           # IDs:
-           'gen_id_and_name',
-           'get_id_or_name',
-           # Kapitelnummern:
-           'ChapterCounter',
-           'parent_chapters',
-           # Sonstige Funktionen:
-           'fix_webdivs',
-           'fix_class_arg',  # class_ --> class
-           'hyperlinkable_strings',
-           'find_headline',
-           'body_content',  # --> neu, besser: parsed_text
-           'contents_stripped',
-           'contents_stripped2',
-           'extract_uid',  # aus browser.transform.utils
-           'extract_local_uid',
-           'extract_uid_from_qs',
-           'extract_uids',
-           'DEFAULT_TAGS_AND_ATTRIBUTES',
-           'make_taginfo_extractor',  # --> z. B. der folgende:
-           'get_tag_info',          # generiert; kein def!
-           'make_uid_generator',      # --> z. B. der folgende:
-           'generate_uids',         # generiert; kein def!
-           'extract_uid_and_tail',
-           'extract_1st_image_info',
-           # 'is_uid_shaped',  --> nun in .functions
-           # Daten:
-           'SOFT_HYPHEN',
-           )
+__all__ = [
+    'make_tag',
+    'make_script',
+    'extract_content',  # siehe auch --> body_content und parsed_text
+    'top_elements',     # gibt eine Liste zurück
+    'get_single_element',
+    'insertAdjacentElement',
+    'INSERT_POSITIONS',
+    'parse_selector',
+    'make_levelfunc',
+    'make_find_expression',
+    # arbeiten mit Klassen;
+    # nur-lesende Filterfunktionen:
+    'has_class',
+    'has_all_classes',
+    'has_any_class',
+    'make_classes_generator',  # (kein Filter, sondern Generator-Factory)
+    'is_empty',
+    'is_whitespace',
+    'is_meat',
+    # sonstige Filterfunktionen:
+    'has_empty_line',
+    'is_block_element',
+    'is_block_with_p',
+    'is_hyperlink',
+    # Navigation:
+    'interesting_successor',
+    # Bearbeitungsfunktionen:
+    # (see swap_classes function in visaplan.plone.tomoodle.helpers._spoons!)
+    'classes_of',
+    'swap_classes',  # substitute {add,append}_class, remove_class{,es}, ...
+    'append_class',
+    'add_class',
+    'remove_class',
+    'remove_classes',
+    'check_class',
+    'change_text',
+    'extract_attributes',
+    # HTML-Bereinigung:
+    'split_paragraphs',
+    'strip_linebreaks',
+    'fence_texts',
+    'strip_empty_successor',
+    # ... Eigenarten der Parser einebnen:
+    'parsed_text',
+    'stripped_soup',
+    # IDs:
+    'gen_id_and_name',
+    'get_id_or_name',
+    # Kapitelnummern:
+    'ChapterCounter',
+    'parent_chapters',
+    # Sonstige Funktionen:
+    'fix_webdivs',
+    'fix_class_arg',  # class_ --> class
+    'hyperlinkable_strings',
+    'find_headline',
+    'body_content',  # --> neu, besser: parsed_text
+    'contents_stripped',
+    'contents_stripped2',
+    'extract_uid',  # aus browser.transform.utils
+    'extract_local_uid',
+    'extract_uid_from_qs',
+    'extract_uids',
+    'DEFAULT_TAGS_AND_ATTRIBUTES',
+    'make_taginfo_extractor',  # --> z. B. der folgende:
+    'get_tag_info',          # generiert; kein def!
+    'make_uid_generator',      # --> z. B. der folgende:
+    'generate_uids',         # generiert; kein def!
+    'extract_uid_and_tail',
+    'extract_1st_image_info',
+    'generate_image_infos',  # new in 1.0.3
+    # 'is_uid_shaped',  --> nun in .functions
+    # Daten:
+    'SOFT_HYPHEN',
+    ]
 
-# Standardmodule:
-from string import ascii_letters, digits, whitespace
-from collections import defaultdict
+# Python compatibility:
+from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit
+
+# Standard library:
 import re
-from six.moves.urllib.parse import urlsplit, urlunsplit, parse_qs
+from collections import defaultdict
+from string import ascii_letters, digits, whitespace
 
-# Installierte Module:
-from bs4 import Tag, NavigableString, BeautifulSoup
+# 3rd party:
+from bs4 import BeautifulSoup, NavigableString, Tag
 
-# Unitracc-Tools:
-from visaplan.tools.html import (entity,
-        BLOCK_ELEMENT_NAMES, EMPTY_ELEMENT_NAMES, REPLACED_ELEMENT_NAMES,
+# visaplan:
+try:
+    # module .html renamed to .htmlohmy in v1.4+:
+    from visaplan.tools.htmlohmy import (
+        BLOCK_ELEMENT_NAMES,
+        EMPTY_ELEMENT_NAMES,
+        REPLACED_ELEMENT_NAMES,
+        entity,
+        )
+except ImportError:
+    from visaplan.tools.html import (
+        BLOCK_ELEMENT_NAMES,
+        EMPTY_ELEMENT_NAMES,
+        REPLACED_ELEMENT_NAMES,
+        entity,
         )
 from visaplan.tools.sequences import inject_indexes
-
 
 # -------------------------------------------- [ Daten ... [
 SOFT_HYPHEN = entity['shy']
@@ -112,7 +133,7 @@ def clone(el):
     Klonfunktion von Martijn Pieters,
     http://stackoverflow.com/a/23058678/1051649:
 
-    >>> soup = BeautifulSoup('<h2 id="42">Die Antwort</h2>')
+    >>> soup = BeautifulSoup('<h2 id="42">Die Antwort</h2>', 'lxml')
     >>> h2 = soup.h2
     >>> h2
     <h2 id="42">Die Antwort</h2>
@@ -191,14 +212,14 @@ def extract_content(soup):
     - entfernt das html- und das body-Element, wenn vorhanden, und wenn das
       html-Element kein head-Element enthält
 
-    >>> soup = BeautifulSoup('<b>one</b><em>two</em>')
+    >>> soup = BeautifulSoup('<b>one</b><em>two</em>', 'html.parser')
     >>> soup.name
-    u'[document]'
+    '[document]'
     >>> boo, seq = extract_content(soup)
     >>> boo
     False
-    >>> map(unicode, seq)
-    [u'<b>one</b>', u'<em>two</em>']
+    >>> list(map(str, seq))
+    ['<b>one</b>', '<em>two</em>']
 
     Wenn keine "Suppe" übergeben wird, handelt es sich um ein einzelnes
     Element, und es wird angenommen, daß keine weitere Verarbeitung nötig ist:
@@ -206,8 +227,15 @@ def extract_content(soup):
     >>> boo, elem = extract_content(seq[0])
     >>> boo
     True
-    >>> unicode(elem)
-    u'<b>one</b>'
+    >>> str(elem)
+    '<b>one</b>'
+
+    >>> soup = BeautifulSoup(' <p> a paragraph', 'lxml')
+    >>> tup = extract_content(soup)
+    >>> tup[0]
+    True
+    >>> str(tup[1])
+    '<p> a paragraph</p>'
 
     """
     if soup.name != '[document]':
@@ -405,10 +433,11 @@ def extract_uids(soup):
     >>> html = ('<img src="/resolveuid/abc123">'
     ...         '<a href="./resolveUid/cde456">honk</a>'
     ...         '<a href="./@@resolveUid/cde789">honk</a>'
-    ...         '<a href="/resolveuid/fab789#bcd024">bonk</a>')
-    >>> soup = BeautifulSoup(html)
+    ...         '<a href="/resolveuid/fab789#bcd024">bonk</a>'
+    ...         '<a href="/@@resolveuid/cde123#efa567">zonk</a>')
+    >>> soup = BeautifulSoup(html, 'lxml')
     >>> list(extract_uids(soup))
-    ['abc123', 'cde456', 'cde789', 'fab789', 'bcd024']
+    ['abc123', 'cde456', 'cde789', 'fab789', 'bcd024', 'cde123', 'efa567']
 
     """
     for elem in soup.find_all(['a', 'img']):
@@ -425,7 +454,7 @@ def extract_uids(soup):
                 yield val
 
 
-def extract_1st_image_info(txt, uid_only=True):
+def extract_1st_image_info(txt, uid_only=True, builder='lxml'):
     """
     Extrahiere die Informationen zum ersten im Text verwendeten Bild
     (ein Python-Dict, oder None).
@@ -439,9 +468,9 @@ def extract_1st_image_info(txt, uid_only=True):
     >>> extract_1st_image_info(txt)
     {'uid': '0123456789abcdef0123456789abcdef'}
     >>> extract_1st_image_info(txt, uid_only=False)
-    {'path': 'spec_by/path.png'}
+    {'path': 'spec/by/path.png'}
     """
-    soup = BeautifulSoup(txt)
+    soup = BeautifulSoup(txt, builder)
     for elem in soup.find_all(['img']):
         val = elem.get('src')
         if not val:
@@ -453,12 +482,77 @@ def extract_1st_image_info(txt, uid_only=True):
             return {'path': val}
 
 
+def generate_image_infos(txt=None, **kwargs):
+    """
+    Scan the text (or soup) for image references and yield dictionaries
+
+    Roughly like extract_1st_image_info, except ...
+
+    - we don't stop after the first image use (because we might not be
+      satisfied), and
+
+    - we allow a soup (if already prepared) to be specified
+
+    >>> txt = ('<p src="/resolveuid/abcdef0123456789abcdef0123456789"></p>'
+    ...        '<img src="spec/by/path.png">'
+    ...        '<img src="resolveuid/0123456789abcdef0123456789abcdef">')
+    >>> def gii(txt, **kw):
+    ...     return list(generate_image_infos(txt, **kw))
+
+    By default, we ignore specifications without UIDs:
+    >>> gii(txt)
+    [{'uid': '0123456789abcdef0123456789abcdef'}]
+
+    >>> gii(txt, uid_only=False)              # doctest: +NORMALIZE_WHITESPACE
+    [{'path': 'spec/by/path.png'},
+     {'uid': '0123456789abcdef0123456789abcdef'}]
+
+    We expect either text or soup, but not both:
+    >>> gii(None)
+    Traceback (most recent call last):
+      ...
+    TypeError: Please specify either txt or soup!
+    >>> gii('some text', soup="not None")  # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+      ...
+    TypeError: Got both txt (<... 'str'>) and soup (<... 'str'>)!
+
+    """
+    pop = kwargs.pop
+    uid_only = pop('uid_only', 1)
+    soup = pop('soup', None)
+    if txt is None and soup is None:
+        raise TypeError('Please specify either txt or soup!')
+    elif soup is None:
+        builder = pop('builder', 'lxml')
+        soup = BeautifulSoup(txt, builder)
+    elif txt is not None:
+        raise TypeError('Got both txt (%s) and soup (%s)!' %
+                (type(txt), type(soup),
+                 ))
+    if kwargs:
+        unused = sorted(kwargs.keys())[0]
+        raise TypeError('Unused keyword argument(s): %(unused)r[..?]'
+                        % locals())
+    for elem in soup.find_all(['img']):
+        val = elem.get('src')
+        if not val:
+            continue
+        uid = extract_uid(val)
+        if uid is not None:
+            yield {'uid': uid}
+        elif not uid_only:
+            yield {'path': val}
+
 
 def top_elements(txt, parser=None):
     """
     Wrapper für extract_content:
     - erledigt das Parsen
     - gibt jedenfalls eine Liste zurück
+
+    NOTE: Please don't specify the (currently optional) 2nd argument by name;
+          we'll likely rename it to 'builder'!
     """
     try:
         soup = BeautifulSoup(txt, parser)
@@ -508,7 +602,7 @@ def gen_id_and_name(elem):
     Generiere id- und name-Attribut des übergebenen Elements
     (jeweils sofern nicht leer)
 
-    >>> soup = BeautifulSoup('<div/>')
+    >>> soup = BeautifulSoup('<div/>', 'lxml')
     >>> elem = soup.new_tag('a', href='#', id='honk')
     >>> list(gen_id_and_name(elem))
     ['honk']
@@ -552,7 +646,8 @@ def make_taginfo_extractor(themap=DEFAULT_TAGS_AND_ATTRIBUTES,
 
     >>> get_tag_info = make_taginfo_extractor()
     >>> soup=BeautifulSoup('<a href="/resolveuid/abc123"/>'
-    ...                    '<img src="resolveUid/def456"/>')
+    ...                    '<img src="resolveUid/def456"/>',
+    ...                    'lxml')
     >>> dic1 = get_tag_info(soup.a)
     >>> sorted(dic1.items())
     [('href', '/resolveuid/abc123'), ('tagname', 'a'), ('uid', 'abc123')]
@@ -561,7 +656,8 @@ def make_taginfo_extractor(themap=DEFAULT_TAGS_AND_ATTRIBUTES,
     [('src', 'resolveUid/def456'), ('tagname', 'img'), ('uid', 'def456')]
     >>> soup2=BeautifulSoup('<img alt="image" class="image-caption"'
     ... 'src="./resolveUid/9e166a01d51569baf679d971167a1d5c/@@scaling'
-    ... '/get?scaling=180x120" />')
+    ... '/get?scaling=180x120" />',
+    ... 'lxml')
     >>> dic3 = get_tag_info(soup2.img)
     >>> sorted(dic3.items())
     [('src', './resolveUid/9e166a01d51569baf679d971167a1d5c/@@scaling/get?scaling=180x120'), ('tagname', 'img'), ('uid', '9e166a01d51569baf679d971167a1d5c')]
@@ -601,7 +697,7 @@ def make_taginfo_extractor(themap=DEFAULT_TAGS_AND_ATTRIBUTES,
 get_tag_info = make_taginfo_extractor()
 
 
-def make_uid_generator(themap=DEFAULT_TAGS_AND_ATTRIBUTES):
+def make_uid_generator(themap=DEFAULT_TAGS_AND_ATTRIBUTES, builder='lxml'):
     """
     Erzeuge eine Funktion, die aus Text oder Suppe die verwendeten UIDs
     extrahiert und generiert
@@ -610,7 +706,12 @@ def make_uid_generator(themap=DEFAULT_TAGS_AND_ATTRIBUTES):
     >>> txt = ('<a href="/resolveuid/abc123"/>'
     ...        '<img src="resolveUid/def456"/>')
     >>> list(f(text=txt))
-    [u'abc123', u'def456']
+    ['abc123', 'def456']
+
+    >>> txt = ('<a href="./@@resolveuid/ab1234"/>'
+    ...        '<img src="@@resolveuid/de5678"/>')
+    >>> list(f(text=txt))
+    ['ab1234', 'de5678']
 
     Reale Beispiele:
     >>> txt2 = ('<p>'
@@ -623,14 +724,14 @@ def make_uid_generator(themap=DEFAULT_TAGS_AND_ATTRIBUTES):
     ... '&nbsp;</p>')
     >>> soup2 = BeautifulSoup(txt2, 'html.parser')
     >>> list(f(txt2))
-    [u'918f7934473e42f4a20f195f92115615']
+    ['918f7934473e42f4a20f195f92115615']
     """
     element_names = list(themap.keys())
     get_tag_info = make_taginfo_extractor(themap=themap)
 
-    def generate_uids(text=None, soup=None):
+    def generate_uids(text=None, soup=None, builder=builder):
         if soup is None:
-            soup = BeautifulSoup(text or '')
+            soup = BeautifulSoup(text or '', builder)
         elif text is not None:
             raise ValueError('Both text and soup given!')
         for elem in soup.find_all(element_names):
@@ -702,10 +803,15 @@ def parse_selector(spec):
     """
     Analysiere den übergebenen (atomaren) CSS-Selektor.
 
-    >>> parse_selector('h1#toc.bonk')
-    ('h1', {'class': ['bonk'], 'id': 'toc'})
-    >>> parse_selector('*#toc.bonk')
-    (None, {'class': ['bonk'], 'id': 'toc'})
+    >>> def parse_selector_(arg):
+    ...     res = parse_selector(arg)
+    ...     return (res[0], sorted(res[1].items()))
+    >>> parse_selector_('h1#toc.bonk')
+    ('h1', [('class', ['bonk']), ('id', 'toc')])
+    >>> parse_selector_('*#toc.bonk')
+    (None, [('class', ['bonk']), ('id', 'toc')])
+    >>> parse_selector_('p.bonk.honk')
+    ('p', [('class', ['bonk', 'honk'])])
 
     Folgende Selektoren würden die Untersuchung des Kontexts des HTML-Knotens
     erfordern, der aber hier nicht übergeben wird, und werden daher *nicht*
@@ -777,7 +883,7 @@ def make_check_equal(key, val):
     <key> mit dem exakten Wert <val> prüft.
 
     >>> f = make_check_equal('id', 'honk')
-    >>> soup = BeautifulSoup('<div/>')
+    >>> soup = BeautifulSoup('<div/>', 'lxml')
     >>> elem1 = soup.new_tag('a', id='honk')
     >>> f(elem1)
     True
@@ -800,7 +906,7 @@ def make_check_hasall(key, seq):
 
     >>> f = make_check_hasall('class', ['honk', 'bonk'])
     >>> dic = {'class': ['honk', 'bonk', 'other']}
-    >>> soup = BeautifulSoup('<div/>')
+    >>> soup = BeautifulSoup('<div/>', 'lxml')
     >>> elem1 = soup.new_tag('a', **dic)
     >>> f(elem1)
     True
@@ -824,7 +930,7 @@ def make_check_hasall(key, seq):
 def make_check_tagname(val):
     """
     >>> f = make_check_tagname('a')
-    >>> soup = BeautifulSoup('<div/>')
+    >>> soup = BeautifulSoup('<div/>', 'lxml')
     >>> elem1 = soup.new_tag('a', id='honk')
     >>> f(elem1)
     True
@@ -874,6 +980,208 @@ def classes_of(elem):
         return A['class']
 
 
+def swap_classes(elem, **kwargs):
+    """
+    Add and/or remove class entries to the given element
+
+    add - one or more class entries to be added
+    remove -- one or more class entries to be removed
+    clear_empty -- finally delete an empty 'class' attribute?
+    conflicting -- what if a class is both contained in the add and remove options?
+
+    >>> div = BeautifulSoup('<div class="bogus-class kept-class">', 'lxml').div
+    >>> div
+    <div class="bogus-class kept-class"></div>
+
+    Both options `add` and `remove` can be given as strings
+    (which will be split), a set, or something we can turn into a set:
+
+    >>> swap_classes(div, remove='bogus-class junk-class')
+    True
+    >>> div
+    <div class="kept-class"></div>
+
+    We check for likely unintentional argument conflicts:
+    >>> swap_classes(div, add='to-be-or-not-to-be', remove='to-be-or-not-to-be')
+    Traceback (most recent call last):
+      ...
+    ValueError: ['to-be-or-not-to-be'] specified for both addition and removal!
+
+    But you may decide how to handle such conflicts:
+    >>> swap_classes(div, add='whatever', remove='whatever', conflicting='add')
+    True
+    >>> div
+    <div class="kept-class whatever"></div>
+
+    Any sets you specify are left unspoiled in such cases:
+    >>> add_set = {'whatever'}
+    >>> remove_set = {'whatever'}
+    >>> swap_classes(div, add=add_set, remove=remove_set, conflicting='remove')
+    True
+    >>> div
+    <div class="kept-class"></div>
+
+    As we had a conflict and decided to 'remove' in that case, the `add` set
+    was changed internally;
+    but the input sets are untouched:
+
+    >>> sorted(add_set)
+    ['whatever']
+    >>> sorted(remove_set)
+    ['whatever']
+
+    The default behaviour is to delete an empty class attribute:
+    >>> swap_classes(div, remove='kept-class whatever')
+    True
+    >>> div
+    <div></div>
+
+    Now for some edge cases.
+    If you don't specify neither `add` nor `remove`, we consider this an error:
+
+    >>> swap_classes(div)
+    Traceback (most recent call last):
+      ...
+    TypeError: Didn't you intend to add or remove anything?!
+
+    But it is quite possible that both arguments *evaluate* to None:
+    >>> swap_classes(div, add='')
+    False
+    >>> div
+    <div></div>
+    >>> swap_classes(div, remove='')
+    False
+    >>> div
+    <div></div>
+    >>> swap_classes(div, add='same-value-again')
+    True
+    >>> div
+    <div class="same-value-again"></div>
+
+    A True return value currently doesn't guarantee the element has been modified:
+    >>> swap_classes(div, remove='another-value')
+    True
+    >>> div
+    <div class="same-value-again"></div>
+
+    You might want to keep the empty class attribute for further processing:
+    >>> swap_classes(div, remove='same-value-again', clear_empty=False)
+    True
+    >>> div
+    <div class=""></div>
+
+    But note: This won't add a class attribute which was not present before;
+    for this to happen, you need to add something!
+
+    We don't check whether the given element has an `attrs` attribute
+    (which is not the case for NavigableStrings);
+    in most cases, your .find or .find_all call will give you a proper element
+    anyway (and it is on you to ensure this!):
+    >>> soup = BeautifulSoup('<p class="">Some text', 'lxml')
+    >>> swap_classes(soup.p.contents[0], add='some-value')
+    Traceback (most recent call last):
+      ...
+    AttributeError: 'NavigableString' object has no attribute 'attrs'
+
+    So, this is how a "final cleanup" could look like:
+
+      for tag in soup.find_all(True):
+          swap_classes(tag, remove=my_zoo_of_helper_classes)
+
+    This `remove` argument might pretty well be falsy (but not None!);
+    in this case, at least the empty class attributes will be removed:
+
+    >>> soup.p
+    <p class="">Some text</p>
+    >>> swap_classes(soup.p, remove=[])
+    True
+    >>> soup.p
+    <p>Some text</p>
+
+    Unknown named arguments trigger a TypeError:
+    >>> swap_classes(soup.p, remove=[], bogus=True)
+    ... #  will look slightly different in Python-3-only implementation
+    ... #                               doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+      ...
+    TypeError: Disallowed argument(s) ('bogus',)
+    """
+    get = kwargs.get
+    add = get('add', None)
+    remove = get('remove', None)
+    clear_empty = get('clear_empty', None)
+    conflicting = get('conflicting', 'fail')
+    disallowed = set(kwargs) - set(['add', 'remove',
+                                    'clear_empty', 'conflicting',
+                                    ])
+    if disallowed:
+        raise TypeError('Disallowed argument(s) %s'
+                        % (tuple(sorted(disallowed)),
+                           ))
+
+    given = set()
+    if add is not None:
+        given.add('add')
+        if isinstance(add, str):
+            add = add.split()
+        if not add:
+            add = None
+        elif not isinstance(add, set) or conflicting == 'remove':
+            add = set(add)
+
+    if remove is not None:
+        given.add('remove')
+        if isinstance(remove, str):
+            remove = remove.split()
+        if not remove:
+            remove = None
+        elif not isinstance(remove, set) or conflicting == 'add':
+            remove = set(remove)
+
+    if add is not None and remove is not None:
+        confl = add.intersection(remove)  # I want the walrus!
+        if not confl:
+            pass
+        elif conflicting == 'fail':
+            raise ValueError('{} specified for both addition and removal!'
+                             .format(sorted(confl)))
+        elif conflicting == 'add':
+            remove -= confl
+            if not remove:
+                remove = None
+        elif conflicting == 'remove':
+            add -= confl
+            if not add:
+                add = None
+        else:
+            raise ValueError('Invalid conflicting choice {}'
+                             .format(conflicting))
+
+    if not given:
+        raise TypeError("Didn't you intend to add or remove anything?!")
+    elif clear_empty is None:
+        clear_empty = add is None
+
+    attrs = elem.attrs
+    oldval = attrs.get('class')
+    if oldval is None and add is None:
+        return False  # no changes
+
+    cls_set = set(attrs.setdefault('class', []))
+    if remove is not None:
+        cls_set -= remove
+
+    if add is not None:
+        cls_set.update(add)
+
+    if cls_set or not clear_empty:
+        attrs['class'] = sorted(cls_set)
+    else:
+        del attrs['class']
+
+    return True  # we *might* have applied changes!
+
+
 def append_class(elem, val, force=False):
     """
     Füge die übergebene Klasse hinzu - ohne Überprüfung, ob sie
@@ -886,7 +1194,7 @@ def append_class(elem, val, force=False):
 
     force -- jedenfalls classes_of aufrufen
 
-    >>> soup = BeautifulSoup('<a/>')
+    >>> soup = BeautifulSoup('<a/>', 'lxml')
     >>> append_class(soup.a, 'test1')
     >>> classes_of(soup.a)
     ['test1']
@@ -909,12 +1217,12 @@ def add_class(elem, val, force=False):
 
     (add: angelehnt an das Verhalten eines Sets)
 
-    >>> soup = BeautifulSoup('<a class="test1 test1"/>')
+    >>> soup = BeautifulSoup('<a class="test1 test1"/>', 'lxml')
 
     Das erzeugte Attribut ist eine schnöde Liste:
 
-    >>> type(soup.a.attrs['class'])
-    <type 'list'>
+    >>> type(soup.a.attrs['class']) # doctest: +ELLIPSIS
+    <... 'list'>
 
     >>> add_class(soup.a, 'test2')
     >>> classes_of(soup.a)
@@ -941,7 +1249,7 @@ def remove_class(elem, val):
     """
     Entferne die übergebene Klasse, sofern vorhanden.
 
-    >>> soup = BeautifulSoup('<a class="test1 test1 test2"/>')
+    >>> soup = BeautifulSoup('<a class="test1 test1 test2"/>', 'lxml')
     >>> classes_of(soup.a)
     ['test1', 'test1', 'test2']
     >>> remove_class(soup.a, 'test1')
@@ -969,7 +1277,7 @@ def check_class(elem, val):
     Gib True zurück, wenn die übergebene Klasse schon vorhanden ist;
     andernfalls füge sie hinzu, und gib False zurück.
 
-    >>> soup = BeautifulSoup('<a/>')
+    >>> soup = BeautifulSoup('<a/>', 'lxml')
     >>> check_class(soup.a, 'test')
     False
     >>> classes_of(soup.a)
@@ -1031,7 +1339,7 @@ def has_any_class(elem, seq, prefix=None):
               für *jede* vorhandene Klasse True (und nur False, wenn *keine*
               Klasse vorhanden ist)
 
-    >>> soup = BeautifulSoup('<a class="foo">bar</a>')
+    >>> soup = BeautifulSoup('<a class="foo">bar</a>', 'lxml')
     >>> soup.a
     <a class="foo">bar</a>
     >>> has_any_class(soup.a, ('foo', 'bar'))
@@ -1056,13 +1364,13 @@ def has_any_class(elem, seq, prefix=None):
     >>> has_any_class(soup.a, (), '')
     True
 
-    >>> soup = BeautifulSoup('<a href="#">Klassenloser Anker</a>')
+    >>> soup = BeautifulSoup('<a href="#">Klassenloser Anker</a>', 'lxml')
     >>> has_any_class(soup.a, (), '')
     False
 
-    >>> soup = BeautifulSoup('<a href="#" class="">Ebenfalls klassenlos</a>')
+    >>> soup = BeautifulSoup('<a href="#" class="">Ebenfalls klassenlos</a>', 'lxml')
     >>> soup.a.attrs['class']
-    ['']
+    []
     >>> has_any_class(soup.a, (), '')
     False
 
@@ -1092,10 +1400,10 @@ def make_classes_generator(regex):
     die auf den gegebenen regulären Ausdruck passen
 
     >>> f = make_classes_generator('^level-[1-9][0-9]*$')
-    >>> elem = BeautifulSoup('<div class="level-2 clearfix">x/div>').div
+    >>> elem = BeautifulSoup('<div class="level-2 clearfix">x/div>', 'lxml').div
     >>> list(f(elem))
     ['level-2']
-    >>> img = BeautifulSoup('<img>').img
+    >>> img = BeautifulSoup('<img>', 'lxml').img
     >>> list(f(img))
     []
 
@@ -1125,13 +1433,13 @@ def is_empty(elem):
     ... a) Betreten des Siloinnenraumes nur, wenn das Silo
     ...    leer ist.<br/>
     ... </div>'''
-    >>> div = BeautifulSoup(txt).div
+    >>> div = BeautifulSoup(txt, 'html.parser').div
     >>> is_empty(div)
     False
     >>> is_empty(div.br)
     True
     >>> txt2 = '<div>      \n  \t      </div>'
-    >>> soup2 = BeautifulSoup(txt2)
+    >>> soup2 = BeautifulSoup(txt2, 'html.parser')
     >>> div2 = soup2.div
     >>> is_empty(div2)
     True
@@ -1142,7 +1450,7 @@ def is_empty(elem):
     >>> after_table = '''<p>
     ...     &nbsp;</p>
     ... '''
-    >>> p = BeautifulSoup(after_table).p
+    >>> p = BeautifulSoup(after_table, 'lxml').p
     >>> p.name
     'p'
     >>> is_empty(p)
@@ -1151,8 +1459,16 @@ def is_empty(elem):
     Achtung - nicht jedes "leere" Element kann auch gelöscht werden!
     Siehe auch --> is_meat()
 
-    >>> img = BeautifulSoup('<img src="img.png">').img
+    >>> img = BeautifulSoup('<img src="img.png">', 'lxml').img
     >>> is_empty(img)
+    True
+
+    >>> div = BeautifulSoup('<div class="row" style="margin-bottom:10px;">\n'
+    ...                     '</div>', 'lxml').div
+    >>> div
+    <div class="row" style="margin-bottom:10px;">
+    </div>
+    >>> is_empty(div)
     True
     """
     s = elem.string
@@ -1162,9 +1478,31 @@ def is_empty(elem):
 
 
 def is_whitespace(elem):
-    """
+    r"""
     Das Element ist Leerraum und an den inneren Rändern von Blockelementen
     uninteressant
+
+    >>> div = BeautifulSoup('''<div><!-- a comment -->
+    ... <em>another element</em><br>
+    ... some text</div>''', 'lxml').div
+    >>> [(is_whitespace(child), child) for child in div.contents]
+    ...                                  # doctest: +NORMALIZE_WHITESPACE
+    [(False, ' a comment '),
+     (True,  '\n'),
+     (False, <em>another element</em>),
+     (True,  <br/>),
+     (False, '\nsome text')]
+
+    But note:
+    >>> div = BeautifulSoup('<div><!-- -->'
+    ...     '<!-- the previous comment is empty! -->', 'lxml').div
+    >>> [(is_whitespace(child), child) for child in div.contents]
+    ...                                  # doctest: +NORMALIZE_WHITESPACE
+    [(True,  ' '),
+     (False, ' the previous command is empty! ')]
+
+    This is considered a bug and will be fixed in a future release.
+
     """
     n = elem.name
     if n is None:
@@ -1179,7 +1517,7 @@ def is_meat(elem):
     Das Element ist sinnvoller Inhalt, der seinen Container erhaltenswert
     macht: Entweder ein benanntes Element, oder zumindest nicht-leerer Text.
 
-    >>> img = BeautifulSoup('<img src="img.png">').img
+    >>> img = BeautifulSoup('<img src="img.png">', 'lxml').img
     >>> is_meat(img)
     True
     """
@@ -1201,17 +1539,17 @@ def has_empty_line(elem):
     die allenfalls durch Leerraum getrennt werden?
 
     >>> txt1 = '<p><br><br></p>'
-    >>> p1 = BeautifulSoup(txt1).p
+    >>> p1 = BeautifulSoup(txt1, 'html.parser').p
     >>> has_empty_line(p1)
     True
 
     >>> txt2 = '<p><br>\n<br></p>'
-    >>> p2 = BeautifulSoup(txt2).p
+    >>> p2 = BeautifulSoup(txt2, 'html.parser').p
     >>> has_empty_line(p2)
     True
 
     >>> txt3 = '<p><br>inbetween<br></p>'
-    >>> p3 = BeautifulSoup(txt3).p
+    >>> p3 = BeautifulSoup(txt3, 'html.parser').p
     >>> has_empty_line(p3)
     False
     """
@@ -1236,7 +1574,7 @@ def is_block_element(elem):
     in Inline-Elementen sowie <p> nicht vorkommen dürfen.
 
     >>> txt = '<div><p><a><img></a></p></div>'
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> is_block_element(soup.div)
     True
     >>> is_block_element(soup.p)
@@ -1245,6 +1583,18 @@ def is_block_element(elem):
     False
     >>> is_block_element(soup.img)
     False
+
+    But, what about Navigable strings?
+    >>> soup2 = BeautifulSoup('<div>A naked string'
+    ...                       '<!-- a comment -->'
+    ...                       '<p>Some text', 'lxml')
+    >>> soup2.div
+    <div>A naked string<!-- a comment --><p>Some text</p></div>
+    >>> [(child.string, child.name, is_block_element(child))
+    ...  for child in soup2.div.children]  # doctest: +NORMALIZE_WHITESPACE
+    [('A naked string', None, False),
+     (' a comment ',    None, False),
+     ('Some text',      'p',  True)]
     """
     return elem.name in BLOCK_ELEMENT_NAMES
 
@@ -1269,17 +1619,32 @@ def is_block_with_p(elem):
 def was_erroneously_filled(elem):
     """
     Das Element hat Inhalt, den es nicht haben dürfte!
+    The element has contents which it shouldn't have!
+
+    Currently we can't reproduce the problem anymore that parsers filled e.g.
+    <br> elements with the following text:
 
     >>> txt = '<div>Text<br>mit Zeilenumbruch</div>'
-    >>> soup = BeautifulSoup(txt, 'html.parser')
-    >>> soup
-    <div>Text<br>mit Zeilenumbruch</br></div>
-
-    >>> was_erroneously_filled(soup.div)
+    >>> soup1 = BeautifulSoup(txt, 'html.parser')
+    >>> soup1
+    <div>Text<br/>mit Zeilenumbruch</div>
+    >>> was_erroneously_filled(soup1.br)
     False
-    >>> soup.br
-    <br>mit Zeilenumbruch</br>
-    >>> was_erroneously_filled(soup.br)
+    >>> soup2 = BeautifulSoup(txt, 'lxml')
+    >>> soup2
+    <html><body><div>Text<br/>mit Zeilenumbruch</div></body></html>
+    >>> was_erroneously_filled(soup2.br)
+    False
+
+    ... but of course we can't be sure it won't happen again.
+    Thus, we construct an invalid element ourselves for this test:
+
+    >>> soup1.br.string = "I shouldn't be here!"
+    >>> was_erroneously_filled(soup1.div)
+    False
+    >>> soup1.br
+    <br>I shouldn't be here!</br>
+    >>> was_erroneously_filled(soup1.br)
     True
     """
     if elem.name is None:
@@ -1297,16 +1662,16 @@ def is_hyperlink(elem):
     """
     Ein Hyperlink ist ein a-Element mit einem href-Attribut.
 
-    >>> is_hyperlink(BeautifulSoup('<a/>').a)
+    >>> is_hyperlink(BeautifulSoup('<a/>', 'lxml').a)
     False
-    >>> is_hyperlink(BeautifulSoup('<a href="#"/>').a)
+    >>> is_hyperlink(BeautifulSoup('<a href="#"/>', 'lxml').a)
     True
 
     Es ist derzeit nicht erheblich, ob das href-Attribut leer ist:
 
-    >>> is_hyperlink(BeautifulSoup('<a href=""/>').a)
+    >>> is_hyperlink(BeautifulSoup('<a href=""/>', 'lxml').a)
     True
-    >>> is_hyperlink(BeautifulSoup('<a href/>').a)
+    >>> is_hyperlink(BeautifulSoup('<a href/>', 'lxml').a)
     True
     """
     try:
@@ -1325,11 +1690,11 @@ def meaningful_attr(name, val):
     False
 
     class-Attribute werden von BeautifulSoup als Liste erzeugt:
-    >>> div = BeautifulSoup('<div class=""/>').div
+    >>> div = BeautifulSoup('<div class=""/>', 'lxml').div
     >>> div
     <div class=""></div>
     >>> div.attrs['class']
-    ['']
+    []
     >>> meaningful_attr('class', [''])
     False
 
@@ -1367,23 +1732,23 @@ def is_meaningful(elem, f=meaningful_attr):
     Leere div- und span-Elemente ohne Attribute haben keine semantische
     Bedeutung:
 
-    >>> is_meaningful(BeautifulSoup('<div/>').div)
+    >>> is_meaningful(BeautifulSoup('<div/>', 'lxml').div)
     False
-    >>> is_meaningful(BeautifulSoup('<span/>').span)
+    >>> is_meaningful(BeautifulSoup('<span/>', 'lxml').span)
     False
 
     Ein leeres Klassenattribut interessiert nicht; eine nicht-leere ID schon:
 
-    >>> is_meaningful(BeautifulSoup('<div class=""/>').div)
+    >>> is_meaningful(BeautifulSoup('<div class=""/>', 'lxml').div)
     False
-    >>> is_meaningful(BeautifulSoup('<div id="x"/>').div)
+    >>> is_meaningful(BeautifulSoup('<div id="x"/>', 'lxml').div)
     True
 
     p und td (z. B.) haben aus sich heraus eine Bedeutung:
 
-    >>> is_meaningful(BeautifulSoup('<p/>').p)
+    >>> is_meaningful(BeautifulSoup('<p/>', 'lxml').p)
     True
-    >>> is_meaningful(BeautifulSoup('<td/>').td)
+    >>> is_meaningful(BeautifulSoup('<td/>', 'lxml').td)
     True
     """
     n = elem.name
@@ -1414,7 +1779,7 @@ def make_find_expression(selector, force_func=False):
     Wenn Attribute involviert sind, wird eine Funktion erzeugt:
 
     >>> f = make_find_expression('h1#toc')
-    >>> soup = BeautifulSoup('<div/>')
+    >>> soup = BeautifulSoup('<div/>', 'lxml')
     >>> elem = soup.new_tag('h1', id='tic')
     >>> f(elem)
     False
@@ -1542,7 +1907,7 @@ def fix_webdivs(soup, counter=None, ch=SOFT_HYPHEN):
     ch - Zeichen (nur zur besseren Testbarkeit)
 
     >>> txt1 = '<div>Trenn<div class="web">-</div>mich</div>'
-    >>> soup1 = BeautifulSoup(txt1)
+    >>> soup1 = BeautifulSoup(txt1, 'html.parser')
     >>> fix_webdivs(soup1, ch='|')
     >>> soup1.div
     <div>Trenn|mich</div>
@@ -1552,10 +1917,12 @@ def fix_webdivs(soup, counter=None, ch=SOFT_HYPHEN):
     Blockelement zu "verschönern"; dieser sitzt dann in den umgebenden
     Elementen:
 
-    >>> txt2 = '<div>  <b>eine</b> Emissions\n  <div class="web">\n  -\n  </div>\nminderungs\n  <div class="web">\n  -\n  </div>\nmaßnahme <em>unter vielen</em></div>'
-    >>> soup2 = BeautifulSoup(txt2.decode('utf-8'))
+    >>> txt2 = ('<div>  <b>eine</b> Emissions\n  <div class="web">\n'
+    ... '  -\n  </div>\nminderungs\n  <div class="web">\n  -\n'
+    ... '  </div>\nmaßnahme <em>unter vielen</em></div>')
+    >>> soup2 = BeautifulSoup(txt2, 'lxml')
     >>> fix_webdivs(soup2, ch='|')
-    >>> soup2.div
+    >>> print(soup2.div)
     <div> <b>eine</b> Emissions|minderungs|maßnahme <em>unter vielen</em></div>
 
     Die Möglichkeit, daß die Schwesterelemente vor und nach dem div.web keine
@@ -1598,7 +1965,7 @@ def change_text(elem, txt, force=False):
     - NavigableString-Objekte
     - einfache Inline-Elemente (em, strong, a etc. )
 
-    >>> soup=BeautifulSoup('<p>( <em>bonk</em> )</p>')
+    >>> soup=BeautifulSoup('<p>( <em>bonk</em> )</p>', 'lxml')
     >>> em = soup.em
     >>> prev_s = em.previous_sibling
     >>> next_s = em.next_sibling
@@ -1617,6 +1984,7 @@ def change_text(elem, txt, force=False):
         else:
             print('ELEMENT %s NOT CHANGED' % elem)
     except AttributeError as e:
+        # Standard library:
         from pprint import pprint
         print('#'*79)
         print('change_text:')
@@ -1641,7 +2009,7 @@ def extract_attributes(elem, alist):
     Soweit die Attribute vorhanden waren, sind sie im zurückgegebenen
     dict-Objekt enthalten.
 
-    >>> soup = BeautifulSoup('<p title="Ohne Worte">Hugh.</p>')
+    >>> soup = BeautifulSoup('<p title="Ohne Worte">Hugh.</p>', 'lxml')
     >>> soup.p
     <p title="Ohne Worte">Hugh.</p>
     >>> extract_attributes(soup.p, ('title', 'id'))
@@ -1657,6 +2025,7 @@ def extract_attributes(elem, alist):
         except KeyError:
             pass
     return res
+
 
 def fix_class_arg(kwargs, default=None, force=False):
     """
@@ -1683,9 +2052,9 @@ def hyperlinkable_strings(soup, all=False, blacklist=['a']):
     Suche ein Textelement heraus, das sich eignet, einen Hyperlink aufzunehmen.
 
     >>> txt = '<img alt="kein Text"> <b>fett</b> <a>und schon verlinkt</a>'
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> list(hyperlinkable_strings(soup))[0]
-    u'fett'
+    'fett'
     """
     for se in soup.strings:
         if (se.parent.name not in blacklist
@@ -1697,37 +2066,37 @@ def hyperlinkable_strings(soup, all=False, blacklist=['a']):
 
 
 def find_headline(elem, func):
-    u"""
+    """
     Durchsuche die Suppe vor dem angegebenen Element nach "seiner" Überschrift
     und gib sie zurück.
 
-    >>> text1 = '<h2>Übungsaufgaben</h2><ol><li>Frage ...</li></ol>'
-    >>> soup1 = BeautifulSoup(text1.decode('utf-8'))
+    >>> text1 = u'<h2>Übungsaufgaben</h2><ol><li>Frage ...</li></ol>'
+    >>> soup1 = BeautifulSoup(text1, 'lxml')
     >>> ffunc = lambda el: el.name == 'h2'
-    >>> find_headline(soup1.ol, ffunc)
+    >>> print(find_headline(soup1.ol, ffunc))
     <h2>Übungsaufgaben</h2>
 
     Überschriften sind manchmal in div-Elementen geschachtelt:
     >>> text2 = '<div><h2>Schwer zu finden</h2></div><ol><li>Frage ...</li></ol>'
-    >>> soup2 = BeautifulSoup(text2)
-    >>> find_headline(soup2.ol, ffunc)
+    >>> soup2 = BeautifulSoup(text2, 'html.parser')
+    >>> print(find_headline(soup2.ol, ffunc))
     <h2>Schwer zu finden</h2>
 
     Oft muß die Elternschaft des angeg. Elements durchsucht werden:
     >>> text3 = '<div><h2>Noch schwerer zu finden</h2></div><div><ol><li>Frage</li></ol></div>'
-    >>> soup3 = BeautifulSoup(text3)
-    >>> find_headline(soup3.ol, ffunc)
+    >>> soup3 = BeautifulSoup(text3, 'html.parser')
+    >>> print(find_headline(soup3.ol, ffunc))
     <h2>Noch schwerer zu finden</h2>
 
     >>> text4 = '<div><h2>Ham</h2><p>Spam</p></div><div><ol><li>Frage</li></ol></div>'
-    >>> soup4 = BeautifulSoup(text4)
-    >>> find_headline(soup4.ol, ffunc)
+    >>> soup4 = BeautifulSoup(text4, 'html.parser')
+    >>> print(find_headline(soup4.ol, ffunc))
     <h2>Ham</h2>
 
     Die Überschrift darf Unterelemente haben:
     >>> text5 = '<div><h2>CO<sub>2</sub></h2></div><div><ol><li>Frage</li></ol></div>'
-    >>> soup5 = BeautifulSoup(text5)
-    >>> find_headline(soup5.ol, ffunc)
+    >>> soup5 = BeautifulSoup(text5, 'html.parser')
+    >>> print(find_headline(soup5.ol, ffunc))
     <h2>CO<sub>2</sub></h2>
 
     Es wird eine "vernünftige" Struktur vorausgesetzt: ein div wird maximal
@@ -1755,7 +2124,7 @@ def body_content(soup):
     BeautifulSoup erzeugt - zumindest bei Verwendung von lxml - stets implizit
     html > body:
 
-    >>> soup = BeautifulSoup('<p>Nur ein Absatz</p>')
+    >>> soup = BeautifulSoup('<p>Nur ein Absatz</p>', 'lxml')
     >>> soup.body
     <body><p>Nur ein Absatz</p></body>
 
@@ -1788,7 +2157,7 @@ def contents_stripped(elem):
     >>> txt = '''<div>
     ... <img src="bild.jpg">
     ... </div>'''
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> div = soup.div
     >>> len(div.contents)
     3
@@ -1799,7 +2168,7 @@ def contents_stripped(elem):
 
     >>> txt2 = '''<div><span></span><img src="bild.jpg">
     ... </div>'''
-    >>> soup2 = BeautifulSoup(txt2)
+    >>> soup2 = BeautifulSoup(txt2, 'html.parser')
     >>> div2 = soup2.div
     >>> len(div2.contents)
     3
@@ -1810,7 +2179,7 @@ def contents_stripped(elem):
     ... Dieser Text ist nicht leer
     ... <img src="bild.jpg">
     ... </div3>'''
-    >>> soup3 = BeautifulSoup(txt3)
+    >>> soup3 = BeautifulSoup(txt3, 'html.parser')
     >>> div3 = soup3.div
     >>> len(div3.contents)
     3
@@ -1836,12 +2205,12 @@ def contents_stripped2(elem):
     >>> txt = '''<div>
     ... <tt>  Text 1  </tt>
     ... <tt>  Text 2  </tt></div>'''
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> div = soup.div
     >>> contents_stripped(div)
-    [<tt>  Text 1  </tt>, u'\n', <tt>  Text 2  </tt>]
+    [<tt>  Text 1  </tt>, '\n', <tt>  Text 2  </tt>]
     >>> contents_stripped2(div)
-    [<tt>Text 1  </tt>, u'\n', <tt>  Text 2  </tt>]
+    [<tt>Text 1  </tt>, '\n', <tt>  Text 2  </tt>]
 
     Wenn das letzte Kindelement ein String ist, wird der hängende Leerraum
     entfernt: (FUNKTIONIERT NOCH NICHT!)
@@ -1849,7 +2218,7 @@ def contents_stripped2(elem):
     >>> txt = '''<div>
     ... <tt>  Text 1  </tt>
     ...   Text 2  </div>'''
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> div = soup.div
     >>> contents_stripped2(div)  # doctest: +SKIP
     [<tt>Text 1  </tt>, u'\n  Text 2']
@@ -1918,11 +2287,12 @@ def _strip_trailing_whitespace(elem):
         return False
 
 
-def get_single_element(txt):
+def get_single_element(txt, builder='lxml'):
     r"""
     Konvertiere HTML-Text und gib seinen Inhalt - ein einziges Element -
     zurück.  Wenn mehrere Elemente auf oberster Ebene vorhanden sind (bzw. im
     body, wenn vom Parser in html>body eingefaßt), tritt ein Fehler auf.
+    (Um ggf. mehrere Elemente zu extrahieren, siehe extract_content(soup).)
 
     >>> txt = '<html><body><p>Ein Absatz</p></body></html>'
     >>> get_single_element(txt)
@@ -1932,13 +2302,13 @@ def get_single_element(txt):
 
     >>> txt2 = '<div id="honk">Ein Div</div>\n'
     >>> soup2 = BeautifulSoup(txt2, 'html.parser')
-    >>> soup2
+    >>> print(soup2)
     <div id="honk">Ein Div</div>
     <BLANKLINE>
     >>> get_single_element(txt2)
     <div id="honk">Ein Div</div>
     """
-    soup = BeautifulSoup(txt.strip())
+    soup = BeautifulSoup(txt.strip(), builder)
     cont = soup
     inner = soup.body
     if inner is not None:
@@ -1958,8 +2328,13 @@ def fix_empty_elements(soup):
     Bereinige leere HTML-Elemente, die z. B. vom Standardparser
     irrtümlich gefüllt wurden.
 
-    >>> txt = '<div>Ein Text<br>mit Zeilenumbruch'
+    The problem tackled by this function is perhaps related to older versions
+    of BeautifulSoup an/or lxml and/or the standard parser only;
+    thus, we construct some faulty soup ourselves.
+
+    >>> txt = '<div>Ein Text<br>'
     >>> soup = BeautifulSoup(txt, 'html.parser')
+    >>> soup.br.string = 'mit Zeilenumbruch'
     >>> soup
     <div>Ein Text<br>mit Zeilenumbruch</br></div>
 
@@ -2006,10 +2381,16 @@ def parsed_text(txt, builder='lxml', **kwargs):
     >>> parsed_text(txt, 'lxml')
     '<div>Ein Text<br/>mit Zeilenumbruch</div>'
 
-    Der mitgelieferte Parser hingegen macht Unfug mit lt. HTML leeren
-    Elementen:
-    >>> BeautifulSoup(txt, 'html.parser')
+    Wir hatten früher Unfug festgestellt -- dergestalt, daß der Standard-Parser
+    per Standard leere Elemente mit Inhalt füllte.
+    Dies stellen wir hier noch einmal nach, um die durchgeführte Korrektur
+    testen zu können:
+    >>> txt = '<div>Ein Text<br>'
+    >>> soup = BeautifulSoup(txt, 'html.parser')
+    >>> soup.br.string = 'mit Zeilenumbruch'
+    >>> soup
     <div>Ein Text<br>mit Zeilenumbruch</br></div>
+    >>> txt = str(soup)
 
     Die Funktion parsed_text räumt damit auf; das Ergebnis ist nun dasselbe wie
     bei Verwendung von lxml:
@@ -2024,10 +2405,14 @@ def parsed_text(txt, builder='lxml', **kwargs):
     >>> BeautifulSoup(html5, 'html.parser')
     <div>Ein Text<br/>mit Zeilenumbruch</div>
 
-    Auch Leerraum am Ende wird entfernt:
+    Leerraum am Ende wird derzeit NICHT entfernt:
     >>> txt2 = '<span>Bla</span>\n\n'
-    >>> BeautifulSoup(txt2, 'lxml')
-    <html><body><span>Bla</span></body></html>
+    >>> soup2 = BeautifulSoup(txt2, 'lxml')
+    >>> print(soup2)
+    <html><body><span>Bla</span>
+    </body></html>
+    >>> parsed_text(txt2, 'lxml')
+    '<span>Bla</span>\n'
 
     """
     soup = BeautifulSoup(txt, builder, **kwargs)
@@ -2042,11 +2427,20 @@ def stripped_soup(soup):
     einen implizit erzeugten html>body-Rahmen.
 
     Von parsed_text verwendet, aber auch davon losgelöst nützlich
+
+    >>> stripped_soup('<html><body><span>Test1</span></body></html>')
+    '<span>Test1</span>'
+    >>> stripped_soup('<html><body></body></html>')
+    ''
+    >>> stripped_soup('')
+    ''
     """
     res = str(soup)
     start, end = (0, None)
     if res.startswith('<html><body>') and res.endswith('</body></html>'):
         start, end = (12, -14)
+    if not res[start:]:
+        return ''
     while res[start] in whitespace:
         start += 1
     if end is None:
@@ -2070,9 +2464,9 @@ def split_paragraphs(root, soup,
     ... <br>
     ... Noch eine</div>
     ... </body></html>'''
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> split_paragraphs(soup.body, soup)
-    >>> soup.body
+    >>> print(soup.body)
     <body>
     <p>Eine Zeile</p><p>
     Noch eine</p>
@@ -2085,10 +2479,10 @@ def split_paragraphs(root, soup,
     ... <br>
     ... wird zweigeteilt</p>
     ... </body></html>'''
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> split_paragraphs(soup.body, soup)
     >>> b2 = soup.body
-    >>> b2
+    >>> print(b2)
     <body>
     <p>Dieser Absatz</p><p>
     wird zweigeteilt</p>
@@ -2104,9 +2498,9 @@ def split_paragraphs(root, soup,
     ... drei Portionen<br>
     ... </p>
     ... </body></html>'''
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> split_paragraphs(soup.body, soup)
-    >>> soup.body
+    >>> print(soup.body)
     <body>
     <p>Dieser Absatz</p><p>
     ergibt
@@ -2118,18 +2512,18 @@ def split_paragraphs(root, soup,
     jedenfalls erhalten; nötigenfalls wird das Element in ein div konvertiert:
 
     >>> txt = '<body><p id="honk"><br>Zwei<br> <br>Abs&auml;tze<br></p></body>'
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> split_paragraphs(soup.body, soup)
-    >>> soup.body
+    >>> print(soup.body)
     <body><div id="honk"><p>Zwei</p><p>Absätze</p></div></body>
 
     Unterschiedliche Ursache, dasselbe Ergebnis: Ein div-element bleibt
     erhalten, wenn es Attribute trägt (Funktionsargument <keep_root>):
 
     >>> txt = '<body><div id="bonk"><br>Zwei<br> <br>Abs&auml;tze<br></div></body>'
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> split_paragraphs(soup.body, soup)
-    >>> soup.body
+    >>> print(soup.body)
     <body><div id="bonk"><p>Zwei</p><p>Absätze</p></div></body>
 
     """
@@ -2172,11 +2566,11 @@ def split_div_to_paragraphs(root, soup,
     ... <div>Eine Zeile<br><br>
     ... Noch eine</div>
     ... </body></html>'''
-    >>> soup1 = BeautifulSoup(txt1)
+    >>> soup1 = BeautifulSoup(txt1, 'html.parser')
     >>> has_empty_line(soup1.div)
     True
     >>> split_div_to_paragraphs(soup1.div, soup1)
-    >>> soup1.body
+    >>> print(soup1.body)
     <body>
     <p>Eine Zeile</p><p>
     Noch eine</p>
@@ -2189,11 +2583,11 @@ def split_div_to_paragraphs(root, soup,
     ... <br>
     ... Noch eine</div>
     ... </body></html>'''
-    >>> soup2 = BeautifulSoup(txt2)
+    >>> soup2 = BeautifulSoup(txt2, 'html.parser')
     >>> has_empty_line(soup2.div)
     True
     >>> split_div_to_paragraphs(soup2.div, soup2)
-    >>> soup2.body
+    >>> print(soup2.body)
     <body>
     <p>Eine Zeile</p><p>
     Noch eine</p>
@@ -2304,7 +2698,7 @@ def strip_linebreaks(elem, remove_empty=False, is_meat=is_meat):
     Entferne etwaige äußere <br>-Elemente.
 
     >>> txt = '<p> <br>Text <br> </p>'
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> soup.p
     <p> <br/>Text <br/> </p>
     >>> strip_linebreaks(soup.p)
@@ -2315,7 +2709,7 @@ def strip_linebreaks(elem, remove_empty=False, is_meat=is_meat):
     kann es entfernt weden:
 
     >>> txt2 = '<div><p> <br> </p></div>'
-    >>> soup2 = BeautifulSoup(txt2)
+    >>> soup2 = BeautifulSoup(txt2, 'html.parser')
     >>> strip_linebreaks(soup2.p, remove_empty=True)
     >>> soup2.div
     <div></div>
@@ -2342,7 +2736,7 @@ def fence_texts(elem, soup, is_block=is_block_element):
     ansonsten False.
 
     >>> txt = '<div>Running free<p>fenced</p></div>'
-    >>> soup = BeautifulSoup(txt)
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> fence_texts(soup.div, soup)
     True
     >>> soup.div
@@ -2370,8 +2764,8 @@ def fence_texts(elem, soup, is_block=is_block_element):
     ...
     ...  Im Folgenden ...
     ...  </div></body>'''
-    >>> soup = BeautifulSoup(txt.decode('utf-8'))
-    >>> soup.body
+    >>> soup = BeautifulSoup(txt, 'html.parser')
+    >>> print(soup.body)  # doctest: +NORMALIZE_WHITESPACE
     <body><div class="attribute-text"><div class="marginalia">Homogenisierung</div>
     <BLANKLINE>
     Die
@@ -2392,7 +2786,7 @@ def fence_texts(elem, soup, is_block=is_block_element):
 
     Bis auf ein p, das nur ein br enthält, schon recht schick:
 
-    >>> soup.div
+    >>> print(soup.div)
     <div class="attribute-text"><div class="marginalia">Homogenisierung</div><p>
     <BLANKLINE>
     Die
@@ -2414,10 +2808,10 @@ def fence_texts(elem, soup, is_block=is_block_element):
     ...         elem.name = 'span'
     ...         return False
     ...     return is_block_element(elem)
-    >>> soup = BeautifulSoup(txt.decode('utf-8'))
+    >>> soup = BeautifulSoup(txt, 'html.parser')
     >>> fence_texts(soup.body.div, soup, is_block=is_block)
     True
-    >>> soup.body
+    >>> print(soup.body)
     <body><div class="attribute-text"><p><span class="marginalia">Homogenisierung</span>
     <BLANKLINE>
     Die
@@ -2457,7 +2851,7 @@ def fence_texts(elem, soup, is_block=is_block_element):
 
 
 def strip_empty_successor(elem):
-    """
+    r"""
     Z. B. für Blockelemente, denen ein wohlmeinender Online-Editor einen leeren
     Absatz angefügt hat, um die Bearbeitbarkeit sicherzustellen.
 
@@ -2470,10 +2864,10 @@ def strip_empty_successor(elem):
     ... <h1>Der nichtleere Absatz</h1>
     ... <p> </p>
     ... </div>'''
-    >>> soup1 = BeautifulSoup(txt1)
+    >>> soup1 = BeautifulSoup(txt1, 'html.parser')
     >>> strip_empty_successor(soup1.h1)
     True
-    >>> soup1.div
+    >>> print(soup1.div)
     <div>
     <h1>Der nichtleere Absatz</h1>
     </div>
@@ -2482,10 +2876,10 @@ def strip_empty_successor(elem):
     ... <h1>Der nichtleere Absatz</h1>
     ... <p> &nbsp;</p>
     ... </div>'''
-    >>> soup2 = BeautifulSoup(txt2)
+    >>> soup2 = BeautifulSoup(txt2, 'html.parser')
     >>> strip_empty_successor(soup2.h1)
     True
-    >>> soup2.div
+    >>> print(soup2.div)
     <div>
     <h1>Der nichtleere Absatz</h1>
     </div>
@@ -2496,10 +2890,10 @@ def strip_empty_successor(elem):
     ... <p>Ein Absatz</p>
     ... </div>
     ... </div>'''
-    >>> soup3 = BeautifulSoup(txt3)
+    >>> soup3 = BeautifulSoup(txt3, 'html.parser')
     >>> strip_empty_successor(soup3.p)
     False
-    >>> soup3.div
+    >>> print(soup3.div)  # doctest: +NORMALIZE_WHITESPACE
     <div>
     <div id="1">
     <p>Ein Absatz</p>
@@ -2512,10 +2906,10 @@ def strip_empty_successor(elem):
     ... </div>
     ... <p></p>
     ... </div>'''
-    >>> soup4 = BeautifulSoup(txt4)
+    >>> soup4 = BeautifulSoup(txt4, 'html.parser')
     >>> strip_empty_successor(soup4.p)
     False
-    >>> soup4.div
+    >>> print(soup4.div)  # doctest: +NORMALIZE_WHITESPACE
     <div>
     <div id="1">
     <p>Ein Absatz</p>
@@ -2529,10 +2923,10 @@ def strip_empty_successor(elem):
     ... <h5>Der nichtleere Absatz</h5>
     ... <p id="5"> </p>
     ... </div>'''
-    >>> soup5 = BeautifulSoup(txt5)
+    >>> soup5 = BeautifulSoup(txt5, 'html.parser')
     >>> strip_empty_successor(soup5.h5)
     False
-    >>> soup5.div
+    >>> print(soup5.div)  # doctest: +NORMALIZE_WHITESPACE
     <div>
     <h5>Der nichtleere Absatz</h5>
     <p id="5"> </p>
@@ -2565,22 +2959,22 @@ def strip_empty_successor(elem):
 
 
 def get_strippable_container(elem, include_start=True):
-    """
+    r"""
     Diese Funktion braucht evtl. einen noch knackigeren Namen ...
 
     Gib den ersten Container zurück, der zur Löschung infrage kommende
     Nachfolger hat (siehe strip_empty_successor)
 
     >>> txt1 = '''<div>
-    <p id="1"><a><img></a>
-    </p>
-    <p id="2"></p>
-    </div>'''
-    >>> soup1 = BeautifulSoup(txt1)
+    ... <p id="1"><a><img></a>
+    ... </p>
+    ... <p id="2"></p>
+    ... </div>'''
+    >>> soup1 = BeautifulSoup(txt1, 'html.parser')
     >>> soup1.img
-    <img>
-    >>> get_strippable_container(soup1.img)
-    <p id="1"><a><img></a>
+    <img/>
+    >>> print(get_strippable_container(soup1.img)) # doctest: +NORMALIZE_WHITESPACE
+    <p id="1"><a><img/></a>
     </p>
 
     """
@@ -2617,5 +3011,6 @@ def get_strippable_container(elem, include_start=True):
 
 
 if __name__ == '__main__':
+    # Standard library:
     import doctest
     doctest.testmod()

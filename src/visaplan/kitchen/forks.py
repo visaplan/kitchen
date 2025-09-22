@@ -7,22 +7,42 @@ Für Doctests muß BeautifulSoup importiert werden:
 
 >>> from bs4 import BeautifulSoup
 """
-from __future__ import print_function
-from __future__ import absolute_import
+# Python compatibility:
+from __future__ import absolute_import, print_function
+
 from six.moves import map
 
-__all__ = ('extract_linktext',
-           'inject_number',
-           'appendix_dots',
-           )
+__all__ = [
+    'convert_dimension_styles',  # img[width] (...) from style
+    'extract_linktext',
+    'inject_number',
+    # function map:
+    'EXTRACT_FUNC',
+    # mapped functions:
+    'extract_from_a',
+    'extract_from_div',
+    'extract_from_img',
+    'extract_from__string',
+    'extract_from_table',
+    'ignore',
+    'extract_from__children',  # the default
+    'extract_from__title',     # helper for extract_from_a
+    # little helpers:
+    'get_numeric_px',  # for convert_dimension_styles
+    'dots',           # numerate headlines
+    'appendix_dots',  # numerate appendixes
+    'upper_alpha',    # 4 --> 'D'
+    'has_caption_class',
+    'styledict',
+    ]
 
-# Standardmodule:
+
+# Standard library:
 from collections import defaultdict
 from string import ascii_uppercase
 
-from visaplan.kitchen.spoons import (
-        extract_uid_and_tail, 
-        )
+# Local imports:
+from visaplan.kitchen.spoons import extract_uid_and_tail
 
 # aus kitchen-Modul importieren? (noch nicht verwendet)
 END_BRACE = {'(': ')',
@@ -115,11 +135,13 @@ def extract_from__string(elem, collector):
         collector.append(txt)
         return True
 
+
 def extract_from__title(elem, collector):
     txt = elem.get('title', '').strip()
     if txt:
         collector.append(txt)
         return True
+
 
 def extract_from__children(elem, collector):
     ok = False
@@ -129,11 +151,13 @@ def extract_from__children(elem, collector):
             ok = True
     return ok
 
+
 def extract_from_table(elem, collector):
     for caption in elem.find_all('caption'):
         if extract_from__children(caption, collector):
             return True
     return False
+
 
 def extract_from_div(elem, collector):
     """
@@ -150,6 +174,7 @@ def extract_from_div(elem, collector):
     for child in elem.children:
         pass
 
+
 def extract_from_img(elem, collector):
     alt = elem.get('alt')
     if alt is not None:
@@ -157,6 +182,7 @@ def extract_from_img(elem, collector):
     if alt:
         collector.append(alt)
         return True
+
 
 def extract_from_a(elem, collector):
     classes = elem.get('class', [])
@@ -170,17 +196,20 @@ def extract_from_a(elem, collector):
     return extract_from__string(elem, collector) or \
            extract_from__children(elem, collector)
 
+
 def convert_dimension_styles(elem, dic, remove_empty=True):
     """
     Konvertiere das übergebene Element:
-    - wenn das Element height- und width-Angaben erlaubt (vorerst: nur
-      img) ...
+    - wenn das Element height- und width-Angaben erlaubt
+      (vorerst: nur img) ...
     - ... lies ein etwaiges style-Attribut aus;
       - wenn height- und width-Angaben mit px-Dimension gefunden werden,
         ersetze sie durch numerische height- und width-Attribute;
       - schon vorhandene height- und width-Attribute haben Vorrang.
       - wenn das style-Attribut anschließend leer ist, wird es entfernt
         (<remove_empty>)
+    - und notiere die ermittelten Werte für 'height' und 'width'
+      im übergebenen Dict `dic`
 
     Argumente:
     elem -- das (BeautifulSoup-) Element (wird modifiziert)
@@ -252,7 +281,7 @@ def convert_dimension_styles(elem, dic, remove_empty=True):
     if width is None:
         # keine Breite aus den einschl. Attributen;
         # aber vielleicht schon im übergebenen Dict?
-        # (aus get_imgtag_info-Aufruf)   
+        # (aus get_imgtag_info-Aufruf)
         width = dic.get(width)
         if width:
             a_dict['width'] = str(width)
@@ -435,9 +464,13 @@ def inject_number(soup, number, elem, func=dots):
 
 
 if __name__ == '__main__':
-    from bs4 import BeautifulSoup
+    # Standard library:
     import doctest
+
+    # 3rd party:
+    from bs4 import BeautifulSoup
     def set_trace(): pass
     doctest.testmod()
 else:
+    # Logging / Debugging:
     from pdb import set_trace

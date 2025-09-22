@@ -15,7 +15,7 @@ but it might have been more difficult, and thus it is left to another
 package.
 
 Features
---------
+========
 
 - ``spoons`` module, for tackling "soup", e.g.
 
@@ -29,12 +29,12 @@ Features
 
   - ``id_factory``::
 
-    new_id = id_factory(...)
-    id = new_id(prefix)
+        new_id = id_factory(...)
+        id = new_id(prefix)
 
 
 Tests remark
-------------
+============
 
 The modules are documented and tested by doctests.
 However, they currently don't fully work because of import problems;
@@ -43,7 +43,7 @@ see the `issue tracker`_.
 Help is appreciated.
 
 Examples
---------
+========
 
 This add-on can be seen in action at the following sites:
 
@@ -52,13 +52,13 @@ This add-on can be seen in action at the following sites:
 
 
 Documentation
--------------
+=============
 
 For now, the functions are documented by doctests.
 
 
 Installation
-------------
+============
 
 Install visaplan.kitchen by adding it to your buildout::
 
@@ -74,26 +74,25 @@ and then running ``bin/buildout``
 
 
 Contribute
-----------
+==========
 
 - Issue Tracker: https://github.com/visaplan/kitchen/issues
 - Source Code: https://github.com/visaplan/kitchen
 
 
 Support
--------
+=======
 
 If you are having issues, please let us know;
 please use the `issue tracker`_ mentioned above.
 
 
 License
--------
+=======
 
 The project is licensed under the GPLv2.
 
 .. _`issue tracker`: https://github.com/visaplan/kitchen/issues
 .. _`beautifulsoup4`: https://pypi.org/project/beautifulsoup4
-.. _`lxml`: https://pypi.org/project/lxml
 
 .. vim: tw=79 cc=+1 sw=4 sts=4 si et
